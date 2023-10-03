@@ -93,7 +93,7 @@ add_action('wp_ajax_filter_projects', 'filter_ajax');
 ==============================================================================================================================
 											Js for Ajax 
 ==============================================================================================================================
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript">
 jQuery(document).ready(function($) {
   $('.cat-list_item').on('click', function(e) {
