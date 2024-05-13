@@ -1,0 +1,39 @@
+====================================[custom.js]=======================================
+
+jQuery(document).ready(function($) {
+    var headerHeight = jQuery('.sticky-header').outerHeight();
+    var hashval = window.location.hash.substring(1);
+    if (hashval !== '') {
+        var targetSection = $('#' + hashval);
+        if (targetSection.length > 0) {
+            $('html, body').animate({
+                scrollTop: targetSection.offset().top - (headerHeight - (window.innerWidth <= 600 ? 50 : 0)) - 30
+            }, 1000)
+        }
+    }
+    jQuery('a[href*=\\#]:not([href=\\#])').on('click', function() {
+        var target = jQuery(this.hash);
+        target = target.length ? target : jQuery('[name=' + this.hash.substr(1) + ']');
+        if (target.length) {
+            var newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + this.hash;
+            history.pushState(null, null, newUrl);
+            jQuery('html,body').animate({
+                scrollTop: target.offset().top - (headerHeight - (window.innerWidth <= 600 ? 50 : 0)) - 30
+            }, 1000);
+            return !1
+        }
+    })
+})
+
+
+====================================[function.php]=======================================
+/// we need to enqeueu the function file to check the js changes 
+
+wp_enqueue_script( 'ozarks-pressure-wash-custom-js', get_template_directory_uri() . '/js/custom.js', array('jquery'), _S_VERSION, true );
+
+====================================[ ]=======================================
+
+
+
+
+ref site :- https://trinitytool.com/services/
