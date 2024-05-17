@@ -1,0 +1,88 @@
+
+====================================[functions.php ]=======================================
+
+// Function to add a new post
+add_action('cloudways_new_cron', 'add_post_on_cron');
+function add_post_on_cron() {
+    $requestOptions = array(
+        'timeout' => 20 
+    );
+    $response = wp_remote_get('https://jsonplaceholder.typicode.com/posts', $requestOptions);
+
+    if (is_wp_error($response)) {
+        error_log('Error retrieving posts: ' . $response->get_error_message());
+        return;
+    }
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+
+    if (empty($data)) {
+        error_log('No posts retrieved from the API.');
+        return;
+    }
+    $category_id = 3;
+    $posts_to_add = 5; 
+
+	    for ($i = 0; $i < $posts_to_add; $i++) {	       
+	        if (!isset($data[$i])) {
+	            break; 
+	        }
+
+		     $post = $data[$i];
+	        // Prepare post data
+	        $post_data = array(
+	            'post_title'     => $post['title'],
+	            'post_content'   => 'This is a new post added by cron job.',
+	            'post_status'    => 'publish',
+	            'post_author'    => 1,
+	            'post_type'      => 'post',
+	            'post_category'  => array($category_id)
+	        );
+
+	        $post_id = wp_insert_post($post_data);
+
+	        if (!is_wp_error($post_id)) {
+	            error_log('New post added with ID: ' . $post_id);
+	        } else {
+	            error_log('Error adding new post: ' . $post_id->get_error_message());
+	        }
+   		}
+}
+
+// Function to Remove a new post
+add_action('cloudways_dell_cron', 'delete_post_on_cron');
+function delete_post_on_cron() {
+    $category_id = 3;
+    $posts_to_delete = get_posts(array(
+        'post_type'      => 'post',
+        'post_status'    => 'publish',
+        'category'       => $category_id,
+        'posts_per_page' => 1
+    ));
+
+    // Loop through the posts and delete them
+    foreach ($posts_to_delete as $post) {
+        wp_trash_post($post->ID, true);
+        error_log('Post deleted with ID: ' . $post->ID);
+    }
+}
+
+
+====================================[ PLugin to test ]=======================================
+
+Plugin url :- https://wordpress.org/plugins/wp-crontrol/
+Plugin name :- WP Crontrol By John Blackbourn
+
+
+STEPS : 
+
+A.) configure the setting by addding hook name which we have created in functions.php
+
+SS :- https://i.imgur.com/FCJ6POv.png
+
+B.) Schedule the disered time which the cron must be update 
+example :- https://i.imgur.com/8xrUYmm.png , https://i.imgur.com/FAQdzNP.png
+
+C.) Checked the LOGS 
+
+SS :- https://i.imgur.com/XxHmFCx.png
